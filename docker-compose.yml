@@ -1,0 +1,55 @@
+version: '2'
+services:
+  mariadb:
+    user: root
+    image: 'bitnami/mariadb:10.1'
+    restart: always
+    environment:
+      - MARIADB_USER=
+      - MARIADB_DATABASE=
+      #- ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_ROOT_PASSWORD=
+      - MARIADB_PASSWORD=
+      #- MOODLE_SKIP_INSTALL=yes
+    volumes:
+      - '/home/docker/learning_center/data:/bitnami'
+  jenkins_slave:
+    build: ./jenkins_slave
+    container_name: learning_center_jenkins_slave
+    restart: always
+    environment:
+      - JENKINS_URL=
+      - JENKINS_AGENT_WORKDIR=/home/jenkins/
+      - JENKINS_NAME=Learning_Center
+      - JENKINS_SECRET=
+    volumes:
+      - '/home/docker/learning_center/data:/bitnami'      
+  moodle:
+    user: root
+    image: 'learning_center'
+    restart: always
+    environment:
+      - MARIADB_USER=
+      - MARIADBB_DATABASE=
+      #- ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_PASSWORD=
+      ##- MOODLE_SKIP_INSTALL 
+      ##
+      - MARIADB_HOST=mariadb
+      - MARIADB_PORT_NUMBER=3306
+      - MOODLE_DATABASE_USER=
+      - MOODLE_DATABASE_NAME=
+      #- ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_ROOT_PASSWORD=
+      - MOODLE_DATABASE_PASSWORD=
+      #- NAMI_LOG_LEVEL=trace
+    volumes:
+      - '/home/docker/learning_center/data:/bitnami'
+    ports:
+      - '80:80'
+      - '443:443'
+    depends_on:
+      - mariadb   
+      - jenkins_slave
+  
+      
