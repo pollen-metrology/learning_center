@@ -5,7 +5,7 @@ BACKUP_DATE=$(date +%Y-%m-%d-%H.%M.%S)
 BACKUP_NAME=backup_$(date +%Y-%m-%d-%H.%M.%S).zip
 BACKUP_SQL=sql_${BACKUP_DATE}.sql;
 BACKUP_FILE=./backup/${BACKUP_NAME}
-
+BACKUP_DEST=${BACKUP_ROOT}/backup
 
 
 #tar -czvf ${BACKUP_NAME} docker exec -it learningcenter_mariadb_1 mysqldump -h mariadb -u bn_moodle --password= bitnami_moodle
@@ -34,3 +34,6 @@ zip -r ${BACKUP_FILE} jenkins_slave/*
 # ROTATION
 echo "purge older backup"
 ./purge_backup.sh
+
+# OFF-SITE SYNCHRO
+rsync -r --delete -av -e 'ssh -p 10122 -i nas-backup-key' ${BACKUP_DEST} sshd@5.182.252.230:/shares/pollenbackup/Docker/learning-center/
