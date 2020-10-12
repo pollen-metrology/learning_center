@@ -3,51 +3,55 @@ services:
   mariadb:
     user: root
     image: 'bitnami/mariadb:10.1'
-    restart: always
+    #    restart: always
     environment:
-      - MARIADB_USER=
-      - MARIADB_DATABASE=
+      - MARIADB_USER=pollen
+      - MARIADB_DATABASE=pollen_learning_center_moodle
       #- ALLOW_EMPTY_PASSWORD=yes
-      - MARIADB_ROOT_PASSWORD=
-      - MARIADB_PASSWORD=
+      - MARIADB_ROOT_PASSWORD=pgfd63hxfdpg024iGms0
+      - MARIADB_PASSWORD=pgfd63hxfdpg024iGms0
       #- MOODLE_SKIP_INSTALL=yes
     volumes:
       - '/home/docker/learning_center/data:/bitnami'
   jenkins_slave:
     build: ./jenkins_slave
     container_name: learning_center_jenkins_slave
-    restart: always
+    #    restart: always
     environment:
-      - JENKINS_URL=
+      - JENKINS_URL=https://jenkins.pollen-metrology.com
       - JENKINS_AGENT_WORKDIR=/home/jenkins/
       - JENKINS_NAME=Learning_Center
-      - JENKINS_SECRET=
+      - JENKINS_SECRET=98cad575bebb2afc80f82ed9c35ffb8df08ef02998554990df1faf7df9ddb6fe
     volumes:
       - '/home/docker/learning_center/data:/bitnami'      
   moodle:
     user: root
     image: 'bitnami/moodle:3.7.0'
-    restart: always
+    #    restart: always
     environment:
-      - MARIADB_USER=
-      - MARIADBB_DATABASE=
+      - MARIADB_USER=pollen
+      - MARIADBB_DATABASE=pollen_learning_center_moodle
       #- ALLOW_EMPTY_PASSWORD=yes
-      - MARIADB_PASSWORD=
+      - MARIADB_PASSWORD=pgfd63hxfdpg024iGms0
       ##- MOODLE_SKIP_INSTALL 
       ##
       - MARIADB_HOST=mariadb
       - MARIADB_PORT_NUMBER=3306
-      - MOODLE_DATABASE_USER=
-      - MOODLE_DATABASE_NAME=
+      - MOODLE_DATABASE_USER=pollen
+      - MOODLE_DATABASE_NAME=pollen_learning_center_moodle
       #- ALLOW_EMPTY_PASSWORD=yes
-      - MARIADB_ROOT_PASSWORD=
-      - MOODLE_DATABASE_PASSWORD=
+      - MARIADB_ROOT_PASSWORD=pgfd63hxfdpg024iGms0
+      - MOODLE_DATABASE_PASSWORD=pgfd63hxfdpg024iGms0
       #- NAMI_LOG_LEVEL=trace
+      # - MOODLE_URL=https://learningcenter.pollen-metrology.com
+      #- MOODLE_REVERSE_LB=true
+      #- MOODLE_SSL=true  
     volumes:
       - '/home/docker/learning_center/data:/bitnami'
     ports:
-      - '80:80'
-      - '443:443'
+      - '280:80'
+      - '2443:443'
+        #- '280:443' 
     depends_on:
       - mariadb   
       - jenkins_slave
