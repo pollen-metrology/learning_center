@@ -1,0 +1,7 @@
+nas-backup-key
+data/
+#backup/*
+# But not this files
+!.gitignore
+!backup/purge_backup.sh
+!backup/script_backup.sh
