@@ -1,22 +1,28 @@
-version: '2'
+# mysql -h 172.14.1.10 -P 3306 -u pollen -ppgfd63hxfdpg024iGms0 --skip-ssl pollen_learning_center_moodle
+version: '3'
 services:
   mariadb:
     user: root
     image: 'bitnami/mariadb:10.1'
-    #    restart: always
+    restart: always
     environment:
       - MARIADB_USER=pollen
       - MARIADB_DATABASE=pollen_learning_center_moodle
       #- ALLOW_EMPTY_PASSWORD=yes
       - MARIADB_ROOT_PASSWORD=pgfd63hxfdpg024iGms0
       - MARIADB_PASSWORD=pgfd63hxfdpg024iGms0
-      #- MOODLE_SKIP_INSTALL=yes
+    networks:
+       learning_center_net:
+           ipv4_address: 172.14.1.10
+    ports:
+      - '3307:3306'
     volumes:
       - '/home/docker/learning_center/data:/bitnami'
+ 
   jenkins_slave:
     build: ./jenkins_slave
     container_name: learning_center_jenkins_slave
-    #    restart: always
+    restart: always
     environment:
       - JENKINS_URL=https://jenkins.pollen-metrology.com
       - JENKINS_AGENT_WORKDIR=/home/jenkins/
@@ -24,10 +30,11 @@ services:
       - JENKINS_SECRET=98cad575bebb2afc80f82ed9c35ffb8df08ef02998554990df1faf7df9ddb6fe
     volumes:
       - '/home/docker/learning_center/data:/bitnami'      
+
   moodle:
     user: root
     image: 'bitnami/moodle:3.7.0'
-    #    restart: always
+    restart: always
     environment:
       - MARIADB_USER=pollen
       - MARIADBB_DATABASE=pollen_learning_center_moodle
@@ -35,8 +42,12 @@ services:
       - MARIADB_PASSWORD=pgfd63hxfdpg024iGms0
       ##- MOODLE_SKIP_INSTALL 
       ##
-      - MARIADB_HOST=mariadb
-      - MARIADB_PORT_NUMBER=3306
+#      - MARIADB_HOST=mariadb
+#      - MARIADB_HOST=172.14.1.1
+#      - MARIADB_PORT_NUMBER=3306
+#      - MARIADB_PORT_NUMBER=3307 
+#      - MOODLE_DATABASE_PORT_NUMBER=3307
+#      - MOODLE_DATABASE_PORT_NUMBER=3307 
       - MOODLE_DATABASE_USER=pollen
       - MOODLE_DATABASE_NAME=pollen_learning_center_moodle
       #- ALLOW_EMPTY_PASSWORD=yes
@@ -49,11 +60,35 @@ services:
     volumes:
       - '/home/docker/learning_center/data:/bitnami'
     ports:
-      - '280:80'
-      - '2443:443'
+      - '380:80'
+      - '3443:443'
+    networks:
+       learning_center_net:
+           ipv4_address: 172.14.1.20
+
+#      - '3443:443'
+#      - '3307:3306' 
         #- '280:443' 
     depends_on:
       - mariadb   
       - jenkins_slave
-  
+#    entrypoint: tail -f /dev/null  
+#    networks:
+#       learning_center_net:
+#           ipv4_address: 172.14.1.10
+
+#    ports:
+#      - '172.14.1.20:380:80'
+#      - '172.14.1.10:380:80'
+#      - '3443:443'
+
+
+
+networks:
+  learning_center_net:
+#    driver: host 
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.14.1.0/24
       
