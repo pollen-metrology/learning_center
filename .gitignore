@@ -1,6 +1,6 @@
 nas-backup-key
 data/
-#backup/*
+backup/*
 # But not this files
 !.gitignore
 !backup/purge_backup.sh
