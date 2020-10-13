@@ -18,9 +18,12 @@ BACKUP_DEST=${BACKUP_ROOT}/backup/backups
 # Go to the root path (for cron)
 cd ${BACKUP_ROOT}
 
+echo "Start Backup Learning Center..."
+
+
 # Backup SQL
 #docker exec -it learningcenter_mariadb_1 mysqldump -h mariadb -u bn_moodle --password= bitnami_moodle > ${BACKUP_SQL}
-docker exec -it learningcenter_mariadb_1 mysqldump -u root --password=pgfd63hxfdpg024iGms0 pollen_learning_center_moodle > ${BACKUP_SQL} 
+docker exec -it learning_center_mariadb_1 mysqldump -u root --password=pgfd63hxfdpg024iGms0 pollen_learning_center_moodle > ${BACKUP_SQL} 
 zip -r ${BACKUP_FILE} ${BACKUP_SQL}
 rm ${BACKUP_SQL}
 
@@ -35,14 +38,15 @@ zip -r ${BACKUP_FILE} ${BACKUP_ROOT}/docker-compose.yml
 zip -r ${BACKUP_FILE} ${BACKUP_ROOT}/jenkins_slave/*
 
 # BACKUP APACHE CONFIG
-zip -r ${BACKUP_FILE} /etc/apache2/sites-available/01-learningcenter.conf
-zip -r ${BACKUP_FILE} /etc/apache2/sites-available/01-learningcenter-le-ssl.conf
+zip -r ${BACKUP_FILE} /etc/apache2/sites-available/010-learningcenter.conf
+zip -r ${BACKUP_FILE} /etc/apache2/sites-available/010-learningcenter-le-ssl.conf
 # BACKUP LETSENCRYPT CONFIG
-zip -r ${BACKUP_FILE} /etc/letsencrypt/live/learningcenter.pollen-metrology.com/*
+zip -r ${BACKUP_FILE} /etc/letsencrypt/live/learningcenter.pollen-metrology.com-0001/*
 
 # Get exists backup before purge
 #ssh sshd@5.182.252.230 -p 10122 -i nas-backup-key
-rsync -av -e 'ssh -p 10122 -i nas-backup-key' sshd@nas-backup-01.pollen-metrology.com:/shares/pollenbackup/Docker/learning-center/backups/ ${BACKUP_DEST}
+#rsync -av -e 'ssh -p 10122 -i nas-backup-key' sshd@nas-backup-01.pollen-metrology.com:/shares/pollenbackup/Docker/learning-center/backups/ ${BACKUP_DEST}
+rsync -av -e 'ssh -p 10122' sshd@nas-backup-01.pollen-metrology.com:/shares/pollenbackup/Docker/learning-center/backups/ ${BACKUP_DEST}
 
 # ROTATION
 echo "purge older backup"
@@ -50,4 +54,9 @@ ${BACKUP_ROOT}/backup/./purge_backup.sh
 #./purge_backup.sh
 
 # OFF-SITE SYNCHRO
-rsync -r --delete -av -e 'ssh -p 10122 -i nas-backup-key' ${BACKUP_DEST} sshd@nas-backup-01.pollen-metrology.com:/shares/pollenbackup/Docker/learning-center/
+#echo "rsync -r --delete -av -e 'ssh -p 10122 -i ${BACKUP_ROOT}/backup/nas-backup-key' ${BACKUP_DEST} sshd@nas-backup-01.pollen-metrology.com:/shares/pollenbackup/Docker/learning-center/"
+#exit
+#rsync -r --delete -av -e 'ssh -p 10122 -i ${BACKUP_ROOT}/backup/nas-backup-key' ${BACKUP_DEST} sshd@nas-backup-01.pollen-metrology.com:/shares/pollenbackup/Docker/learning-center/
+rsync -r --delete -av -e 'ssh -p 10122' ${BACKUP_DEST} sshd@nas-backup-01.pollen-metrology.com:/shares/pollenbackup/Docker/learning-center/
+
+exit
